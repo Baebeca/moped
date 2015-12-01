@@ -6911,10 +6911,9 @@ body {
 .controls a {
   display: inline-block;
 }
-.controls a:hover,
 .controls a:active,
 .controls a.active {
-  color: #cef;
+  color: #333;
 }
 .controls .glyphicon {
   color: #fff;

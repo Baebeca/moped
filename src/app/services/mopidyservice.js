@@ -96,7 +96,7 @@ angular.module('moped.mopidy', [])
         this.start();
       },
       getPlaylists: function() {
-        return wrapMopidyFunc("mopidy.playlists.getPlaylists", this)();
+        return wrapMopidyFunc("mopidy.playlists.asList", this)();
       },
       getPlaylist: function(uri) {
         return wrapMopidyFunc("mopidy.playlists.lookup", this)({ uri: uri });
@@ -135,10 +135,10 @@ angular.module('moped.mopidy', [])
         return wrapMopidyFunc("mopidy.playback.seek", this)({ time_position: timePosition });
       },
       getVolume: function() {
-        return wrapMopidyFunc("mopidy.playback.getVolume", this)();
+        return wrapMopidyFunc("mopidy.mixer.getVolume", this)();
       },
       setVolume: function(volume) {
-        return wrapMopidyFunc("mopidy.playback.setVolume", this)({ volume: volume });
+        return wrapMopidyFunc("mopidy.mixer.setVolume", this)({ volume: volume });
       },
       getState: function() {
         return wrapMopidyFunc("mopidy.playback.getState", this)();
@@ -146,7 +146,7 @@ angular.module('moped.mopidy', [])
       playTrack: function(track, surroundingTracks) {
         var self = this;
 
-        // Check if a playlist change is required. If not cust change the track.
+        // Check if a playlist change is required. If not just change the track.
         if (self.currentTlTracks.length > 0) {
           var trackUris = _.pluck(surroundingTracks, 'uri');
           var currentTrackUris = _.map(self.currentTlTracks, function(tlTrack) {
@@ -159,10 +159,7 @@ angular.module('moped.mopidy', [])
                 var tlTrackToPlay = _.find(self.currentTlTracks, function(tlTrack) {
                   return tlTrack.track.uri === track.uri;
                 });
-                self.mopidy.playback.changeTrack({ tl_track: tlTrackToPlay })
-                  .then(function() {
-                    self.mopidy.playback.play();
-                  });
+                self.mopidy.playback.play({ tl_track: tlTrackToPlay });
               });
             return;
           }
@@ -182,10 +179,7 @@ angular.module('moped.mopidy', [])
                 var tlTrackToPlay = _.find(tlTracks, function(tlTrack) {
                   return tlTrack.track.uri === track.uri;
                 });
-                self.mopidy.playback.changeTrack({ tl_track: tlTrackToPlay })
-                  .then(function() {
-                    self.mopidy.playback.play();
-                  });
+                self.mopidy.playback.play({ tl_track: tlTrackToPlay });
               }, consoleError);
           } , consoleError);
       },
@@ -223,6 +217,9 @@ angular.module('moped.mopidy', [])
       },
       setRandom: function (isRandom) {
         return wrapMopidyFunc("mopidy.tracklist.setRandom", this)([ isRandom ]);
+      },
+      getCurrentTrackList: function () {
+        return wrapMopidyFunc("mopidy.tracklist.getTracks", this)();
       }
     };
   });

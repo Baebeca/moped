@@ -56,6 +56,7 @@ angular.module('moped.playlists', [
       else {
         processedPlaylists.push(playlist);
       }
+
     });
 
     return processedPlaylists;
@@ -63,14 +64,14 @@ angular.module('moped.playlists', [
 
   function loadPlaylists() {
     mopidyservice.getPlaylists().then(function(data) {
-      $scope.playlists = processPlaylists(data);
+      $scope.playlists = processPlaylists(data);      
     }, console.error.bind(console));
   }
 
   $scope.playlists = [];
 
   $scope.$on('mopidy:state:online', function() {
-    loadPlaylists();
+    loadPlaylists(); 
   });
 
   $scope.$on('mopidy:event:playlistsLoaded', function() {
@@ -79,11 +80,15 @@ angular.module('moped.playlists', [
 })
 
 .controller('PlaylistCtrl', function PlaylistController($scope, $routeParams, mopidyservice, util) {
-  $scope.playlist = {};
+  function loadPlaylist() {
+    mopidyservice.getPlaylist($routeParams.uri).then(function(data) {
+      $scope.playlist = data;
+    }, console.error.bind(console));    
+  }
 
-  mopidyservice.getPlaylist($routeParams.uri).then(function(data) {
-    $scope.playlist = data;
-  }, console.error.bind(console));
+  $scope.playlist = {};
+ 
+  loadPlaylist();
 
   $scope.$on('moped:playtrackrequest', function(event, track) {
     mopidyservice.playTrack(track, $scope.playlist.tracks);
